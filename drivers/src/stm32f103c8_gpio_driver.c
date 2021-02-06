@@ -28,9 +28,26 @@ static inline void enableClock (GPIOHandle_t *handle) {
 }
 
 
+static inline void setModeAFFPP (GPIOHandle_t *handle) {
+
+    uint8_t reg = ((handle->config.pinNumber * 4) / 32);
+    uint8_t position = ((handle->config.pinNumber * 4) % 32);
+
+    if (reg == 1) {
+        handle->GPIOx->CRH &= ~(15u << position);
+        //handle->GPIOx->CRH &= ~(3u << (position + 2));
+        handle->GPIOx->CRH |= (0xAu << position);
+    } else if (reg == 0) {
+        handle->GPIOx->CRL &= ~(15u << position);
+        //handle->GPIOx->CRH &= ~(3u << (position + 2));
+        handle->GPIOx->CRL |= (0xAu << position);
+    }
+}
+
+
 static inline void setModeIF (GPIOHandle_t *handle) {
 
-    uint8_t reg = (handle->config.pinNumber / 32);
+    uint8_t reg = ((handle->config.pinNumber * 4) / 32);
     uint8_t position = ((handle->config.pinNumber * 4) % 32);
 
     if (reg == 1) {
@@ -78,8 +95,7 @@ static inline void writePinLow (GPIOHandle_t *handle) {
 
 
 static inline uint32_t getPinState (GPIOHandle_t *handle) {
-    uint32_t state = (handle->GPIOx->ODR & (1u << handle->config.pinNumber));
-    return state;
+    return (handle->GPIOx->ODR & (1u << handle->config.pinNumber));
 }
 
 
@@ -90,25 +106,44 @@ void GPIO_init (GPIOHandle_t *handle) {
 
     enableClock(handle);
 
-    if (handle->config.mode == inputFloating) {
+    switch (handle->config.mode) {
+
+    case inputFloating:
         setModeIF(handle);
+        break;
 
-    } else if (handle->config.mode == inputPullUp) {
+    case inputPullUp:
         //
-    } else if (handle->config.mode == inputPullDown) {
+        break;
+
+    case inputPullDown:
         //
-    } else if (handle->config.mode == analog) {
+        break;
+
+    case analog:
         //
-    } else if (handle->config.mode == outputOD) {
+        break;
+
+    case outputOD:
         //
-    } else if (handle->config.mode == outputPP) {
+        break;
+
+    case outputPP:
         setModeOPP(handle);
+        break;
 
-    } else if (handle->config.mode == altFunctionPP) {
+    case altFunctionPP:
+        setModeAFFPP(handle);
+        break;
+
+    case altFunctionOD:
         //
-    } else if (handle->config.mode == altFunctionOD) {
-        //
+        break;
+
+    default:
+        break;
     }
+
 }
 
 

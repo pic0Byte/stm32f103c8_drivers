@@ -1,3 +1,31 @@
+/*  stm32f103c8_timer_driver.c
+ *
+ *  By pic0Byte 2021
+ *
+ *
+ *
+ */
+
+
+/*  @ToDo
+ *
+ *  Helpers:
+ *  ---enableChannelOutput--- done!
+ *  ---setChannelDir--- done!
+ *  ---setCapCompOutMode--- done!
+ *
+ *  combine setmode & setcountup/down/updown?
+ *
+ *  API:
+ *  timerChannelInit input setup (output is done - convert from if() to switch())
+ *  finish interrupt handlers
+ *
+ *  move setCaptureCompare functions into hardware specific API section???
+ *
+ */
+
+
+
 #include "stm32f103c8_timer_driver.h"
 
 
@@ -10,6 +38,8 @@
 
 
 /*****************>  Helper functions - hardware specific  <******************/
+/*  @Helpers                                                                 */
+
 
 static inline void disableClock (timer_t *timer) {
 
@@ -59,9 +89,121 @@ static inline void enableClock (timer_t *timer) {
 }
 
 
+static inline void enableChannelOutput (timerHandle_t *handle, uint8_t channel) {
+
+
+    switch (channel) {
+
+    case 1:
+        handle->pTIMx->CCER |= (1u << 0);
+        break;
+
+    case 2:
+        handle->pTIMx->CCER |= (1u << 4);
+        break;
+
+    case 3:
+        handle->pTIMx->CCER |= (1u << 8);
+        break;
+
+    case 4:
+        handle->pTIMx->CCER |= (1u << 12);
+        break;
+
+    default:
+        break;
+    }
+
+
+}
+
+
 static inline void enableCounter (timer_t *timer) {
 
     timer->CR1 |= (1u << 0);
+
+}
+
+
+static inline void setCapCompOutMode (timerHandle_t *handle, uint8_t channel) {
+
+    switch (channel) {
+
+    case 1:
+        handle->pTIMx->CCMR1 &= ~(3u << 4);
+        handle->pTIMx->CCMR1 |= ((handle->channel1.outputMode) << 4);
+        break;
+
+    case 2:
+        handle->pTIMx->CCMR1 &= ~(3u << 12);
+        handle->pTIMx->CCMR1 |= ((handle->channel2.outputMode) << 12);
+        break;
+
+    case 3:
+        handle->pTIMx->CCMR2 &= ~(3u << 4);
+        handle->pTIMx->CCMR2 |= ((handle->channel3.outputMode) << 4);
+        break;
+
+    case 4:
+        handle->pTIMx->CCMR2 &= ~(3u << 12);
+        handle->pTIMx->CCMR2 |= ((handle->channel4.outputMode) << 12);
+        break;
+
+    default:
+        break;
+
+    }
+
+}
+
+
+static inline void setCaptureCompare1Value (timer_t *timer, uint16_t val) {
+    timer->CCR1 = val;
+}
+
+
+static inline void setCaptureCompare2Value (timer_t *timer, uint16_t val) {
+    timer->CCR2 = val;
+}
+
+
+static inline void setCaptureCompare3Value (timer_t *timer, uint16_t val) {
+    timer->CCR3 = val;
+}
+
+
+static inline void setCaptureCompare4Value (timer_t *timer, uint16_t val) {
+    timer->CCR4 = val;
+}
+
+
+static inline void setChannelDir (timerHandle_t *handle, uint8_t channel) {
+
+        switch (channel) {
+
+        case 1:
+            handle->pTIMx->CCMR1 &= ~(3u << 0);
+            handle->pTIMx->CCMR1 |= ((handle->channel1.channelDir) << 0);
+            break;
+
+        case 2:
+            handle->pTIMx->CCMR1 &= ~(3u << 8);
+            handle->pTIMx->CCMR1 |= ((handle->channel2.channelDir) << 8);
+            break;
+
+        case 3:
+            handle->pTIMx->CCMR2 &= ~(3u << 0);
+            handle->pTIMx->CCMR2 |= ((handle->channel3.channelDir) << 0);
+            break;
+
+        case 4:
+            handle->pTIMx->CCMR2 &= ~(3u << 8);
+            handle->pTIMx->CCMR2 |= ((handle->channel4.channelDir) << 8);
+            break;
+
+        default:
+            break;
+        }
 
 }
 
@@ -122,6 +264,7 @@ static inline void setReloadRegister (timer_t *timer, uint16_t ticks) {
 /*******************>  API functions - hardware agnostic  <*******************/
 
 
+
 void timerInit (timerHandle_t *handle){
 
 
@@ -130,13 +273,13 @@ void timerInit (timerHandle_t *handle){
 
 	switch (handle->config.direction){
 
-	case CountUp:
+	case TIM_DIR_countUp:
 	    setCountUp(handle->pTIMx);
 	    break;
-	case CountDown:
+	case TIM_DIR_countDown:
 	    setCountDown(handle->pTIMx);
 	    break;
-	case CountUpDown:
+	case TIM_DIR_countUpDown:
 	    setCountUpDown(handle->pTIMx);
 	    break;
 	default :
@@ -146,10 +289,10 @@ void timerInit (timerHandle_t *handle){
 
 	switch (handle->config.mode){
 
-	case periodic:
+	case TIM_MOD_periodic:
 	    setModePeriodic(handle->pTIMx);
 	    break;
-	case oneShot:
+	case TIM_MOD_oneShot:
 	    setModeOneShot(handle->pTIMx);
 	    break;
 	default:
@@ -167,12 +310,150 @@ void timerInit (timerHandle_t *handle){
 }
 
 
-void timerSetPeriod (timerHandle_t *handle, uint32_t uSeconds){
+void timerChannelInit (timerHandle_t *handle, uint8_t channel) {
+
+    switch (channel) {
+
+    case 1:
+        setChannelDir (handle, 1);
+
+        switch (handle->channel1.channelDir) {
+
+        case TIM_CHDIR_output:
+            setCapCompOutMode (handle, 1);
+            enableChannelOutput(handle, 1);
+            break;
+
+        case TIM_CHDIR_input:
+            break;
+
+        case TIM_CHDIR_inputAlt:
+            break;
+
+        case TIM_CHDIR_intTrigger:
+            break;
+
+        default:
+            break;
+
+        }
+
+        break;
+
+    case 2:
+        setChannelDir (handle, 2);
+
+        switch (handle->channel2.channelDir) {
+
+        case TIM_CHDIR_output:
+            setCapCompOutMode (handle, 2);
+            enableChannelOutput(handle, 2);
+            break;
+
+        case TIM_CHDIR_input:
+            break;
+
+        case TIM_CHDIR_inputAlt:
+            break;
+
+        case TIM_CHDIR_intTrigger:
+            break;
+
+        default:
+            break;
+
+        }
+
+    case 3:
+        setChannelDir (handle, 3);
+
+        switch (handle->channel3.channelDir) {
+
+        case TIM_CHDIR_output:
+            setCapCompOutMode (handle, 3);
+            enableChannelOutput(handle, 3);
+            break;
+
+        case TIM_CHDIR_input:
+            break;
+
+        case TIM_CHDIR_inputAlt:
+            break;
+
+        case TIM_CHDIR_intTrigger:
+            break;
+
+        default:
+            break;
+
+        }
+
+    case 4:
+        setChannelDir (handle, 4);
+
+        switch (handle->channel4.channelDir) {
+
+        case TIM_CHDIR_output:
+            setCapCompOutMode (handle, 4);
+            enableChannelOutput(handle, 4);
+            break;
+
+        case TIM_CHDIR_input:
+            break;
+
+        case TIM_CHDIR_inputAlt:
+            break;
+
+        case TIM_CHDIR_intTrigger:
+            break;
+
+        default:
+            break;
+
+        }
+
+    default:
+        break;
+
+    }
+
+}
+
+
+void timerSetPeriod (timerHandle_t *handle, uint32_t uSeconds) {
     uint32_t ticks = (CLOCK_TICKS_PER_USEC * uSeconds);
 
     if (ticks <= 65535) {
         setReloadRegister (handle->pTIMx, ticks);
     }
+}
+
+
+void timerSetCaptureCompare1Value (timerHandle_t *handle, uint16_t val) {
+
+    setCaptureCompare1Value(handle->pTIMx, val);
+
+}
+
+
+void timerSetCaptureCompare2Value (timerHandle_t *handle, uint16_t val) {
+
+    setCaptureCompare2Value(handle->pTIMx, val);
+
+}
+
+
+void timerSetCaptureCompare3Value (timerHandle_t *handle, uint16_t val) {
+
+    setCaptureCompare3Value(handle->pTIMx, val);
+
+}
+
+
+void timerSetCaptureCompare4Value (timerHandle_t *handle, uint16_t val) {
+
+    setCaptureCompare4Value(handle->pTIMx, val);
+
 }
 
 
@@ -192,7 +473,14 @@ __attribute__((weak)) void timer2InterruptCallback () {
 }
 
 
+__attribute__((weak)) void timer3InterruptCallback () {
+
+}
+
+
+
 /**************************>  Interrupt handlers  <***************************/
+
 
 
 void TIM2_IRQHandler () {
@@ -206,11 +494,12 @@ void TIM2_IRQHandler () {
 void TIM3_IRQHandler () {
 
     TIM3->SR &= ~(1u << 0);
-    //timer3InterruptCallback ();
+    timer3InterruptCallback ();
 
 }
 
 
+/*****************************************************************************/
 
 
 

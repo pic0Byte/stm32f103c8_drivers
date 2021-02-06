@@ -5,8 +5,8 @@
  *      Author: Mitch
  */
 
-#ifndef INC_STM32F103C8_BSP_H_
-#define INC_STM32F103C8_BSP_H_
+#ifndef INC_STM32F103C8_BSP_H
+#define INC_STM32F103C8_BSP_H
 
 #include "stm32f10x.h"
 
@@ -16,6 +16,11 @@
 
 
 /*********************>  Clock enable / disable macros  <*********************/
+
+
+/* AFIO */
+#define RCC_PCLK_AFIO_EN                (RCC->APB2ENR |= (1u << 0))
+
 
 /* GPIO */
 #define RCC_PCLK_GPIOA_EN               (RCC->APB2ENR |= (1u << 2))
@@ -28,6 +33,7 @@
 #define RCC_PCLK_GPIOB_DI               (RCC->APB2ENR &= ~(1u << 3))
 #define RCC_PCLK_GPIOC_DI               (RCC->APB2ENR &= ~(1u << 4))
 #define RCC_PCLK_GPIOD_DI               (RCC->APB2ENR &= ~(1u << 5))
+
 
 /* Timers */
 #define RCC_PCLK_TIM1_EN                (RCC->APB2ENR |= (1u << 11))
@@ -62,7 +68,15 @@
 #define RCC_PCLK_TIM14_DI               (RCC->APB1ENR &= ~(1u << 8))
 
 
+/* I2C */
+#define RCC_PCLK_I2C1_EN                (RCC->APB1ENR |= (1u << 21))
+#define RCC_PCLK_I2C2_EN                (RCC->APB1ENR |= (1u << 22))
+
+#define RCC_PCLK_I2C1_DI                (RCC->APB1ENR &= ~(1u << 21))
+#define RCC_PCLK_I2C2_DI                (RCC->APB1ENR &= ~(1u << 22))
 
 
+/******************************************************************************/
 
-#endif /* INC_STM32F103C8_BSP_H_ */
+
+#endif /* INC_STM32F103C8_BSP_H */
