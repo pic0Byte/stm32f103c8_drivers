@@ -96,81 +96,81 @@ void pwmChannelInit (pwmHandle_t *handle, uint8_t channel) {
 
     case 1:
 
-        handle->outputPin1.config.mode = altFunctionPP;
+        handle->outputPin1.config.mode = GPIO_MOD_altFunctionPP;
 
         if (handle->config.ch1Polarity == PWM_CHP_inverted) {
 
-            handle->timer.channel1.outputMode = TIM_COM_pwmInverted;
+            handle->timer.channel1.outputCompareMode = TIM_COM_pwmInverted;
 
         } else {
 
-            handle->timer.channel1.outputMode = TIM_COM_pwmNonInverted;
+            handle->timer.channel1.outputCompareMode = TIM_COM_pwmNonInverted;
 
         }
 
         handle->timer.channel1.capCompPreload = TIM_PREL_preloadEn;
 
-        GPIO_init(&(handle->outputPin1));
+        GPIOinit(&(handle->outputPin1));
         timerChannelInit(&(handle->timer), 1);
         break;
 
     case 2:
 
-        handle->outputPin2.config.mode = altFunctionPP;
+        handle->outputPin2.config.mode = GPIO_MOD_altFunctionPP;
 
         if (handle->config.ch2Polarity == PWM_CHP_inverted) {
 
-            handle->timer.channel2.outputMode = TIM_COM_pwmInverted;
+            handle->timer.channel2.outputCompareMode = TIM_COM_pwmInverted;
 
         } else {
 
-            handle->timer.channel2.outputMode = TIM_COM_pwmNonInverted;
+            handle->timer.channel2.outputCompareMode = TIM_COM_pwmNonInverted;
 
         }
 
         handle->timer.channel2.capCompPreload = TIM_PREL_preloadEn;
 
-        GPIO_init(&(handle->outputPin2));
+        GPIOinit(&(handle->outputPin2));
         timerChannelInit(&(handle->timer), 2);
         break;
 
     case 3:
 
-        handle->outputPin3.config.mode = altFunctionPP;
+        handle->outputPin3.config.mode = GPIO_MOD_altFunctionPP;
 
         if (handle->config.ch3Polarity == PWM_CHP_inverted) {
 
-            handle->timer.channel3.outputMode = TIM_COM_pwmInverted;
+            handle->timer.channel3.outputCompareMode = TIM_COM_pwmInverted;
 
         } else {
 
-            handle->timer.channel3.outputMode = TIM_COM_pwmNonInverted;
+            handle->timer.channel3.outputCompareMode = TIM_COM_pwmNonInverted;
 
         }
 
         handle->timer.channel3.capCompPreload = TIM_PREL_preloadEn;
 
-        GPIO_init(&(handle->outputPin3));
+        GPIOinit(&(handle->outputPin3));
         timerChannelInit(&(handle->timer), 3);
         break;
 
     case 4:
 
-        handle->outputPin4.config.mode = altFunctionPP;
+        handle->outputPin4.config.mode = GPIO_MOD_altFunctionPP;
 
         if (handle->config.ch4Polarity == PWM_CHP_inverted) {
 
-            handle->timer.channel4.outputMode = TIM_COM_pwmInverted;
+            handle->timer.channel4.outputCompareMode = TIM_COM_pwmInverted;
 
         } else {
 
-            handle->timer.channel4.outputMode = TIM_COM_pwmNonInverted;
+            handle->timer.channel4.outputCompareMode = TIM_COM_pwmNonInverted;
 
         }
 
         handle->timer.channel4.capCompPreload = TIM_PREL_preloadEn;
 
-        GPIO_init(&(handle->outputPin4));
+        GPIOinit(&(handle->outputPin4));
         timerChannelInit(&(handle->timer), 4);
         break;
 

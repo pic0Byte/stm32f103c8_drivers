@@ -14,10 +14,11 @@
 
 /*************************>  Configuration enum's  <**************************/
 
-typedef enum {inputFloating, inputPullUp, inputPullDown, analog, outputOD, outputPP, altFunctionPP, altFunctionOD} GPIO_mode;
+typedef enum {GPIO_MOD_inputFloating, GPIO_MOD_inputPullUp, GPIO_MOD_inputPullDown, GPIO_MOD_analog, GPIO_MOD_outputOD, GPIO_MOD_outputPP,
+    GPIO_MOD_altFunctionPP, GPIO_MOD_altFunctionOD} GPIO_mode;
 
 
-typedef enum {disabled, risingEdge, fallingEdge, risingFallingEdge} GPIO_interruptType;
+typedef enum {GPIO_INT_disabled, GPIO_INT_risingEdge, GPIO_INT_fallingEdge, GPIO_INT_risingFallingEdge} GPIO_interruptType;
 
 
 /*************************>  Structure typedef's  <***************************/
@@ -45,7 +46,7 @@ typedef struct {
 
 /***********************>  API function prototypes  <*************************/
 
-void GPIO_init(GPIOHandle_t *handle);
+void GPIOinit(GPIOHandle_t *handle);
 
 void GPIO_writePin(GPIOHandle_t *handle, uint8_t state);
 void GPIO_togglePin(GPIOHandle_t *handle);

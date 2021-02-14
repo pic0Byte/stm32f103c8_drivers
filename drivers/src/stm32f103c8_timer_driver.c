@@ -41,7 +41,7 @@
 /*  @Helpers                                                                 */
 
 
-static inline void disableClock (timer_t *timer) {
+static inline void disableClock (_timer_t *timer) {
 
     if (timer == TIM1) RCC_PCLK_TIM1_DI;
     if (timer == TIM2) RCC_PCLK_TIM2_DI;
@@ -62,14 +62,14 @@ static inline void disableClock (timer_t *timer) {
 }
 
 
-static inline void disableCounter (timer_t *timer) {
+static inline void disableCounter (_timer_t *timer) {
 
     timer->CR1 &= ~(1u << 0);
 
 }
 
 
-static inline void enableClock (timer_t *timer) {
+static inline void enableClock (_timer_t *timer) {
 
     if (timer == TIM1) RCC_PCLK_TIM1_EN;
     if (timer == TIM2) RCC_PCLK_TIM2_EN;
@@ -89,7 +89,7 @@ static inline void enableClock (timer_t *timer) {
 }
 
 
-static inline void enableChannelOutput (timerHandle_t *handle, uint8_t channel) {
+static inline void enableCapComp (timerHandle_t *handle, uint8_t channel) {
 
 
     switch (channel) {
@@ -118,7 +118,7 @@ static inline void enableChannelOutput (timerHandle_t *handle, uint8_t channel) 
 }
 
 
-static inline void enableCounter (timer_t *timer) {
+static inline void enableCounter (_timer_t *timer) {
 
     timer->CR1 |= (1u << 0);
 
@@ -131,22 +131,22 @@ static inline void setCapCompOutMode (timerHandle_t *handle, uint8_t channel) {
 
     case 1:
         handle->pTIMx->CCMR1 &= ~(3u << 4);
-        handle->pTIMx->CCMR1 |= ((handle->channel1.outputMode) << 4);
+        handle->pTIMx->CCMR1 |= ((handle->channel1.outputCompareMode) << 4);
         break;
 
     case 2:
         handle->pTIMx->CCMR1 &= ~(3u << 12);
-        handle->pTIMx->CCMR1 |= ((handle->channel2.outputMode) << 12);
+        handle->pTIMx->CCMR1 |= ((handle->channel2.outputCompareMode) << 12);
         break;
 
     case 3:
         handle->pTIMx->CCMR2 &= ~(3u << 4);
-        handle->pTIMx->CCMR2 |= ((handle->channel3.outputMode) << 4);
+        handle->pTIMx->CCMR2 |= ((handle->channel3.outputCompareMode) << 4);
         break;
 
     case 4:
         handle->pTIMx->CCMR2 &= ~(3u << 12);
-        handle->pTIMx->CCMR2 |= ((handle->channel4.outputMode) << 12);
+        handle->pTIMx->CCMR2 |= ((handle->channel4.outputCompareMode) << 12);
         break;
 
     default:
@@ -157,22 +157,22 @@ static inline void setCapCompOutMode (timerHandle_t *handle, uint8_t channel) {
 }
 
 
-static inline void setCaptureCompare1Value (timer_t *timer, uint16_t val) {
+static inline void setCaptureCompare1Value (_timer_t *timer, uint16_t val) {
     timer->CCR1 = val;
 }
 
 
-static inline void setCaptureCompare2Value (timer_t *timer, uint16_t val) {
+static inline void setCaptureCompare2Value (_timer_t *timer, uint16_t val) {
     timer->CCR2 = val;
 }
 
 
-static inline void setCaptureCompare3Value (timer_t *timer, uint16_t val) {
+static inline void setCaptureCompare3Value (_timer_t *timer, uint16_t val) {
     timer->CCR3 = val;
 }
 
 
-static inline void setCaptureCompare4Value (timer_t *timer, uint16_t val) {
+static inline void setCaptureCompare4Value (_timer_t *timer, uint16_t val) {
     timer->CCR4 = val;
 }
 
@@ -208,7 +208,8 @@ static inline void setChannelDir (timerHandle_t *handle, uint8_t channel) {
 }
 
 
-static inline void setCountUp (timer_t *timer) {
+
+static inline void setCountUp (_timer_t *timer) {
 
 	timer->CR1 &= ~(0x3u << 5);
 	timer->CR1 &= ~(0x1u << 4);
@@ -216,7 +217,7 @@ static inline void setCountUp (timer_t *timer) {
 }
 
 
-static inline void setCountDown (timer_t *timer) {
+static inline void setCountDown (_timer_t *timer) {
 
     timer->CR1 &= ~(0x3u << 5);
     timer->CR1 |= (0x1u << 4);
@@ -224,7 +225,7 @@ static inline void setCountDown (timer_t *timer) {
 }
 
 
-static inline void setCountUpDown (timer_t *timer) {
+static inline void setCountUpDown (_timer_t *timer) {
 
     timer->CR1 |= (0x3u << 6);
     timer->CR1 &= ~(0x1u << 4);
@@ -232,33 +233,52 @@ static inline void setCountUpDown (timer_t *timer) {
 }
 
 
-static inline void setModePeriodic (timer_t *timer) {
+static inline void setExtTriggerPrescaler (timerHandle_t *handle) {
+
+    if (handle->slaveConfig.exTriggerPrescaler <= TIM_EXTPR_divBy8) {
+
+        handle->pTIMx->SMCR &= ~(3u << 12);
+        handle->pTIMx->SMCR |= (handle->slaveConfig.exTriggerPrescaler << 12);
+    }
+
+
+
+}
+
+
+static inline void setModePeriodic (_timer_t *timer) {
 
     timer->CR1 &= ~(1u << 3);
 
 }
 
 
-static inline void setModeOneShot (timer_t *timer) {
+static inline void setModeOneShot (_timer_t *timer) {
 
     timer->CR1 |= (1u << 3);
 
 }
 
 
-static inline void setPrescaler (timer_t *timer, uint16_t value) {
+static inline void setPrescaler (_timer_t *timer, uint16_t value) {
 
     timer->PSC = value;
 
 }
 
 
-static inline void setReloadRegister (timer_t *timer, uint16_t ticks) {
+static inline void setReloadRegister (_timer_t *timer, uint16_t ticks) {
 
     timer->ARR = ticks;
 
 }
 
+
+static inline void setSlaveMode (_timer_t *timer, timerSlaveMode_t slaveMode) {
+
+    timer->SMCR |= (slaveMode << 0);
+
+}
 
 
 /*******************>  API functions - hardware agnostic  <*******************/
@@ -268,43 +288,48 @@ static inline void setReloadRegister (timer_t *timer, uint16_t ticks) {
 void timerInit (timerHandle_t *handle){
 
 
-    enableClock (handle->pTIMx);
+    if (handle) {
+
+        enableClock (handle->pTIMx);
 
 
-	switch (handle->config.direction){
+        switch (handle->config.direction){
 
-	case TIM_DIR_countUp:
-	    setCountUp(handle->pTIMx);
-	    break;
-	case TIM_DIR_countDown:
-	    setCountDown(handle->pTIMx);
-	    break;
-	case TIM_DIR_countUpDown:
-	    setCountUpDown(handle->pTIMx);
-	    break;
-	default :
-	    break;
-	}
-
-
-	switch (handle->config.mode){
-
-	case TIM_MOD_periodic:
-	    setModePeriodic(handle->pTIMx);
-	    break;
-	case TIM_MOD_oneShot:
-	    setModeOneShot(handle->pTIMx);
-	    break;
-	default:
-	    break;
-	}
+        case TIM_DIR_countUp:
+            setCountUp(handle->pTIMx);
+            break;
+        case TIM_DIR_countDown:
+            setCountDown(handle->pTIMx);
+            break;
+        case TIM_DIR_countUpDown:
+            setCountUpDown(handle->pTIMx);
+            break;
+        default :
+            break;
+        }
 
 
-	setPrescaler(handle->pTIMx, handle->config.preScaler);
+        switch (handle->config.mode){
 
-	setReloadRegister(handle->pTIMx, handle->config.reloadValue);
+        case TIM_MOD_periodic:
+            setModePeriodic(handle->pTIMx);
+            break;
+        case TIM_MOD_oneShot:
+            setModeOneShot(handle->pTIMx);
+            break;
+        default:
+            break;
+        }
 
-	enableCounter (handle->pTIMx);
+
+
+        setPrescaler(handle->pTIMx, handle->config.preScaler);
+
+        setReloadRegister(handle->pTIMx, handle->config.reloadValue);
+
+
+        enableCounter (handle->pTIMx);
+    }
     
 
 }
@@ -312,108 +337,126 @@ void timerInit (timerHandle_t *handle){
 
 void timerChannelInit (timerHandle_t *handle, uint8_t channel) {
 
-    switch (channel) {
+    if (handle) {
 
-    case 1:
-        setChannelDir (handle, 1);
+        switch (channel) {
 
-        switch (handle->channel1.channelDir) {
+        case 1:
+            setChannelDir (handle, 1);
 
-        case TIM_CHDIR_output:
-            setCapCompOutMode (handle, 1);
-            enableChannelOutput(handle, 1);
+            switch (handle->channel1.channelDir) {
+
+            case TIM_CHDIR_output:
+                setCapCompOutMode (handle, 1);
+                enableCapComp(handle, 1);
+                break;
+
+            case TIM_CHDIR_input:
+                //enableCapComp(handle, 1);
+                break;
+
+            case TIM_CHDIR_inputAlt:
+                break;
+
+            case TIM_CHDIR_intTrigger:
+                break;
+
+            default:
+                break;
+
+            }
+
             break;
 
-        case TIM_CHDIR_input:
-            break;
+            case 2:
+                setChannelDir (handle, 2);
 
-        case TIM_CHDIR_inputAlt:
-            break;
+                switch (handle->channel2.channelDir) {
 
-        case TIM_CHDIR_intTrigger:
-            break;
+                case TIM_CHDIR_output:
+                    setCapCompOutMode (handle, 2);
+                    enableCapComp(handle, 2);
+                    break;
 
-        default:
-            break;
+                case TIM_CHDIR_input:
+                    //enableCapComp(handle, 2);
+                    break;
+
+                case TIM_CHDIR_inputAlt:
+                    break;
+
+                case TIM_CHDIR_intTrigger:
+                    break;
+
+                default:
+                    break;
+
+                }
+
+                case 3:
+                    setChannelDir (handle, 3);
+
+                    switch (handle->channel3.channelDir) {
+
+                    case TIM_CHDIR_output:
+                        setCapCompOutMode (handle, 3);
+                        enableCapComp(handle, 3);
+                        break;
+
+                    case TIM_CHDIR_input:
+                        break;
+
+                    case TIM_CHDIR_inputAlt:
+                        break;
+
+                    case TIM_CHDIR_intTrigger:
+                        break;
+
+                    default:
+                        break;
+
+                    }
+
+                    case 4:
+                        setChannelDir (handle, 4);
+
+                        switch (handle->channel4.channelDir) {
+
+                        case TIM_CHDIR_output:
+                            setCapCompOutMode (handle, 4);
+                            enableCapComp(handle, 4);
+                            break;
+
+                        case TIM_CHDIR_input:
+                            break;
+
+                        case TIM_CHDIR_inputAlt:
+                            break;
+
+                        case TIM_CHDIR_intTrigger:
+                            break;
+
+                        default:
+                            break;
+
+                        }
+
+                        default:
+                            break;
 
         }
+    }
 
-        break;
+}
 
-    case 2:
-        setChannelDir (handle, 2);
 
-        switch (handle->channel2.channelDir) {
+void timerSlaveInit (timerHandle_t *handle) {
 
-        case TIM_CHDIR_output:
-            setCapCompOutMode (handle, 2);
-            enableChannelOutput(handle, 2);
-            break;
 
-        case TIM_CHDIR_input:
-            break;
+    if (handle) {
 
-        case TIM_CHDIR_inputAlt:
-            break;
-
-        case TIM_CHDIR_intTrigger:
-            break;
-
-        default:
-            break;
-
-        }
-
-    case 3:
-        setChannelDir (handle, 3);
-
-        switch (handle->channel3.channelDir) {
-
-        case TIM_CHDIR_output:
-            setCapCompOutMode (handle, 3);
-            enableChannelOutput(handle, 3);
-            break;
-
-        case TIM_CHDIR_input:
-            break;
-
-        case TIM_CHDIR_inputAlt:
-            break;
-
-        case TIM_CHDIR_intTrigger:
-            break;
-
-        default:
-            break;
-
-        }
-
-    case 4:
-        setChannelDir (handle, 4);
-
-        switch (handle->channel4.channelDir) {
-
-        case TIM_CHDIR_output:
-            setCapCompOutMode (handle, 4);
-            enableChannelOutput(handle, 4);
-            break;
-
-        case TIM_CHDIR_input:
-            break;
-
-        case TIM_CHDIR_inputAlt:
-            break;
-
-        case TIM_CHDIR_intTrigger:
-            break;
-
-        default:
-            break;
-
-        }
-
-    default:
-        break;
+        setSlaveMode (handle->pTIMx, handle->slaveConfig.slaveMode);
+        setExtTriggerPrescaler (handle);
 
     }
 
@@ -454,6 +497,17 @@ void timerSetCaptureCompare4Value (timerHandle_t *handle, uint16_t val) {
 
     setCaptureCompare4Value(handle->pTIMx, val);
 
+}
+
+
+uint16_t timerGetCountVal (timerHandle_t *handle){
+    return handle->pTIMx->CNT;
+}
+
+
+void timerSetCounterVal (timerHandle_t *handle, uint16_t value) {
+
+    handle->pTIMx->CNT = value;
 }
 
 

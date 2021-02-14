@@ -45,6 +45,26 @@ static inline void setModeAFFPP (GPIOHandle_t *handle) {
 }
 
 
+static inline void setModeIPu (GPIOHandle_t *handle) {
+
+    uint8_t reg = ((handle->config.pinNumber * 4) / 32);
+    uint8_t position = ((handle->config.pinNumber * 4) % 32);
+
+    if (reg == 1) {
+        handle->GPIOx->CRH &= ~(3u << position);
+        handle->GPIOx->CRH &= ~(3u << (position + 2));
+        handle->GPIOx->CRH |= (2u << (position + 2));
+        handle->GPIOx->ODR |= (1u << handle->config.pinNumber);
+    } else if (reg == 0) {
+        handle->GPIOx->CRL &= ~(3u << position);
+        handle->GPIOx->CRL &= ~(3u << (position + 2));
+        handle->GPIOx->CRL |= (2u << (position + 2));
+        handle->GPIOx->ODR |= (1u << handle->config.pinNumber);
+    }
+
+}
+
+
 static inline void setModeIF (GPIOHandle_t *handle) {
 
     uint8_t reg = ((handle->config.pinNumber * 4) / 32);
@@ -102,46 +122,50 @@ static inline uint32_t getPinState (GPIOHandle_t *handle) {
 /*******************>  API functions - hardware agnostic  <*******************/
 
 
-void GPIO_init (GPIOHandle_t *handle) {
+void GPIOinit (GPIOHandle_t *handle) {
 
-    enableClock(handle);
 
-    switch (handle->config.mode) {
+    if (handle) {
 
-    case inputFloating:
-        setModeIF(handle);
-        break;
+        enableClock(handle);
 
-    case inputPullUp:
-        //
-        break;
+        switch (handle->config.mode) {
 
-    case inputPullDown:
-        //
-        break;
+        case GPIO_MOD_inputFloating:
+            setModeIF(handle);
+            break;
 
-    case analog:
-        //
-        break;
+        case GPIO_MOD_inputPullUp:
+            setModeIPu(handle);
+            break;
 
-    case outputOD:
-        //
-        break;
+        case GPIO_MOD_inputPullDown:
+            //
+            break;
 
-    case outputPP:
-        setModeOPP(handle);
-        break;
+        case GPIO_MOD_analog:
+            //
+            break;
 
-    case altFunctionPP:
-        setModeAFFPP(handle);
-        break;
+        case GPIO_MOD_outputOD:
+            //
+            break;
 
-    case altFunctionOD:
-        //
-        break;
+        case GPIO_MOD_outputPP:
+            setModeOPP(handle);
+            break;
 
-    default:
-        break;
+        case GPIO_MOD_altFunctionPP:
+            setModeAFFPP(handle);
+            break;
+
+        case GPIO_MOD_altFunctionOD:
+            //
+            break;
+
+        default:
+            break;
+        }
     }
 
 }
