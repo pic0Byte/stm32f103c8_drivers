@@ -522,15 +522,9 @@ void timerIRQInit (timerHandle_t *handle) {
 }
 
 
-__attribute__((weak)) void timer2InterruptCallback () {
-
-}
-
-
-__attribute__((weak)) void timer3InterruptCallback () {
-
-}
-
+__attribute__((weak)) void timer2InterruptCallback () {}
+__attribute__((weak)) void timer3InterruptCallback () {}
+__attribute__((weak)) void timer4InterruptCallback () {}
 
 
 /**************************>  Interrupt handlers  <***************************/
@@ -549,6 +543,14 @@ void TIM3_IRQHandler () {
 
     TIM3->SR &= ~(1u << 0);
     timer3InterruptCallback ();
+
+}
+
+
+void TIM4_IRQHandler () {
+
+    TIM4->SR &= ~(1u << 0);
+    timer4InterruptCallback ();
 
 }
 

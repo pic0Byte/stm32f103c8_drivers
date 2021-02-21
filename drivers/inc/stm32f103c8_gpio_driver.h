@@ -2,7 +2,7 @@
  * stm32f103c8_gpio_driver.h
  *
  *  Created on: 14 Nov 2020
- *      Author: Mitch
+ *      Author: pic0byte
  */
 
 #ifndef INC_STM32F103C8_GPIO_DRIVER_H_
@@ -14,11 +14,23 @@
 
 /*************************>  Configuration enum's  <**************************/
 
-typedef enum {GPIO_MOD_inputFloating, GPIO_MOD_inputPullUp, GPIO_MOD_inputPullDown, GPIO_MOD_analog, GPIO_MOD_outputOD, GPIO_MOD_outputPP,
-    GPIO_MOD_altFunctionPP, GPIO_MOD_altFunctionOD} GPIO_mode;
+
+typedef enum {GPIO_ST_low, GPIO_ST_high} gpioState_t;
 
 
-typedef enum {GPIO_INT_disabled, GPIO_INT_risingEdge, GPIO_INT_fallingEdge, GPIO_INT_risingFallingEdge} GPIO_interruptType;
+typedef enum {GPIO_DIR_input, GPIO_DIR_output10Mhz, GPIO_DIR_output2Mhz, GPIO_DIR_output50Mhz} gpioDir_t;
+
+
+typedef enum {GPIO_IMOD_analog, GPIO_IMOD_floating, GPIO_IMOD_puPd} gpioInputMode_t;
+
+
+typedef enum {GPIO_OMOD_outPushPull, GPIO_OMOD_outOpenDrain, GPIO_OMOD_altFunPushPull, GPIO_OMOD_altFunOpenDrain} gpioOutputMode_t;
+
+
+typedef enum {GPIO_PUPD_pullDown, GPIO_PUPD_pullUp} gpioPullUpDown_t;
+
+
+typedef enum {GPIO_EEN_edgeDisabled, GPIO_EEN_edgeEnabled} gpioEdgeEnable_t;
 
 
 /*************************>  Structure typedef's  <***************************/
@@ -29,9 +41,13 @@ typedef GPIO_TypeDef GPIO_t;
 
 typedef struct {
 
-    GPIO_mode mode;
+    gpioDir_t direction;
+    gpioInputMode_t inputMode;
+    gpioPullUpDown_t pullUpDown;
+    gpioOutputMode_t outputMode;
     uint8_t pinNumber;
-    GPIO_interruptType interruptType;
+    gpioEdgeEnable_t risingEdgeInterruptEnable;
+    gpioEdgeEnable_t fallingEdgeInterruptEnable;
 
 } GPIOConfig_t;
 
@@ -48,12 +64,36 @@ typedef struct {
 
 void GPIOinit(GPIOHandle_t *handle);
 
+
+gpioState_t GPIOReadPin (GPIOHandle_t *handle);
 void GPIO_writePin(GPIOHandle_t *handle, uint8_t state);
 void GPIO_togglePin(GPIOHandle_t *handle);
 
-/*****************************>  GPIO macros  <*******************************/
 
-#define GPIO_LOW                0x0u
-#define GPIO_HIGH               0x1u
+void gpioEnableInterrupt (GPIOHandle_t *handle);
+
+void exti0InterruptCallback ();
+void exti1InterruptCallback ();
+void exti2InterruptCallback ();
+void exti3InterruptCallback ();
+void exti4InterruptCallback ();
+void exti5InterruptCallback ();
+void exti6InterruptCallback ();
+void exti7InterruptCallback ();
+void exti8InterruptCallback ();
+void exti9InterruptCallback ();
+void exti10InterruptCallback ();
+void exti11InterruptCallback ();
+void exti12InterruptCallback ();
+void exti13InterruptCallback ();
+void exti14InterruptCallback ();
+void exti15InterruptCallback ();
+
+
+/*****************************************************************************/
+
+
+
+
 
 #endif /* INC_STM32F103C8_GPIO_DRIVER_H_ */

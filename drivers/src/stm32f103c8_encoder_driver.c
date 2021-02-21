@@ -70,8 +70,10 @@ void encoderInit (encoderHandle_t *handle) {
     timerSlaveInit(&(handle->timer));
 
     setChannelPins(handle);
-    handle->pin1.config.mode = GPIO_MOD_inputPullUp;
-    handle->pin2.config.mode = GPIO_MOD_inputPullUp;
+    handle->pin1.config.inputMode = GPIO_IMOD_puPd;
+    handle->pin1.config.pullUpDown = GPIO_PUPD_pullUp;
+    handle->pin2.config.inputMode = GPIO_IMOD_puPd;
+    handle->pin2.config.pullUpDown = GPIO_PUPD_pullUp;
     GPIOinit(&(handle->pin1));
     GPIOinit(&(handle->pin2));
 

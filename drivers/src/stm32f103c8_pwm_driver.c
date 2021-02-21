@@ -96,7 +96,7 @@ void pwmChannelInit (pwmHandle_t *handle, uint8_t channel) {
 
     case 1:
 
-        handle->outputPin1.config.mode = GPIO_MOD_altFunctionPP;
+        handle->outputPin1.config.outputMode = GPIO_OMOD_altFunPushPull;
 
         if (handle->config.ch1Polarity == PWM_CHP_inverted) {
 
@@ -116,7 +116,7 @@ void pwmChannelInit (pwmHandle_t *handle, uint8_t channel) {
 
     case 2:
 
-        handle->outputPin2.config.mode = GPIO_MOD_altFunctionPP;
+        handle->outputPin2.config.outputMode = GPIO_OMOD_altFunPushPull;
 
         if (handle->config.ch2Polarity == PWM_CHP_inverted) {
 
@@ -136,7 +136,7 @@ void pwmChannelInit (pwmHandle_t *handle, uint8_t channel) {
 
     case 3:
 
-        handle->outputPin3.config.mode = GPIO_MOD_altFunctionPP;
+        handle->outputPin3.config.outputMode = GPIO_OMOD_altFunPushPull;
 
         if (handle->config.ch3Polarity == PWM_CHP_inverted) {
 
@@ -156,7 +156,7 @@ void pwmChannelInit (pwmHandle_t *handle, uint8_t channel) {
 
     case 4:
 
-        handle->outputPin4.config.mode = GPIO_MOD_altFunctionPP;
+        handle->outputPin4.config.outputMode = GPIO_OMOD_altFunPushPull;
 
         if (handle->config.ch4Polarity == PWM_CHP_inverted) {
 
