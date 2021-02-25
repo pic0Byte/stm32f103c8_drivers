@@ -38,11 +38,19 @@ typedef enum {TIM_MOD_periodic, TIM_MOD_oneShot} __attribute__((packed, aligned(
 typedef enum {TIM_CHDIR_output, TIM_CHDIR_input, TIM_CHDIR_inputAlt, TIM_CHDIR_intTrigger} timerChannelDir_t;
 
 
-typedef enum {TIM_EXTPR_prescalerDisabled, TIM_EXTPR_divBy2, TIM_EXTPR_divBy4, TIM_EXTPR_divBy8} timerExTrigPrescaler_t;
+typedef enum {TIM_ICF_noFilter, TIM_ICF_noDiv2samples, TIM_ICF_noDiv4samples, TIM_ICF_noDiv8samples, TIM_ICF_div2_6samples, TIM_ICF_div2_8samples,
+    TIM_ICF_div4_6samples, TIM_ICF_div4_8samples, TIM_ICF_div8_6samples, TIM_ICF_div8_8samples, TIM_ICF_div16_5samples, TIM_ICF_div16_6samples,
+    TIM_ICF_div16_8samples, TIM_ICF_div32_5samples, TIM_ICF_div32_6samples, TIM_ICF_div32_8samples} timerChannelInputCapFilter_t;
+
+
+typedef enum {TIM_IETR_risingEdge, TIM_IETR_fsllingEdge} timerChannelInputEdgeTrigger_t;
 
 
 typedef enum {TIM_COM_frozen, TIM_COM_setToActive, TIM_COM_setToInactive, TIM_COM_toggle, TIM_COM_forceActive,
-    TIM_COM_forceInactive, TIM_COM_pwmNonInverted, TIM_COM_pwmInverted} timerOutputCompareMode_t;
+    TIM_COM_forceInactive, TIM_COM_pwmNonInverted, TIM_COM_pwmInverted} timerChannelOutputCompareMode_t;
+
+
+typedef enum {TIM_EXTPR_prescalerDisabled, TIM_EXTPR_divBy2, TIM_EXTPR_divBy4, TIM_EXTPR_divBy8} timerExTrigPrescaler_t;
 
 
 typedef enum {TIM_PREL_preloadDi, TIM_PREL_preloadEn} timerRegisterPreload_t;
@@ -52,7 +60,7 @@ typedef enum {TIM_SLM_disabled, TIM_SLM_encoderT2, TIM_SLM_encoderT1, TIM_SLM_en
     TIM_SLM_gatedMode, TIM_SLM_triggerMode, TIM_SLM_externalMode} timerSlaveMode_t;
 
 
-//typedef enum {TIM_IM_encoder, TIM_IM_encoder2} timerInputCompareMode_t;
+
 
 
 
@@ -69,9 +77,6 @@ typedef struct {
    uint16_t reloadValue;
 
 
-
-
-
 } timerConfig_t;
 
 
@@ -79,11 +84,11 @@ typedef struct {
 
     uint16_t capCompValue;
     timerChannelDir_t channelDir;
-    timerOutputCompareMode_t outputCompareMode;
+    timerChannelOutputCompareMode_t outputCompareMode;
     timerRegisterPreload_t capCompPreload;
-
-    //timerInputCompareMode_t inputCompareMode;
-    uint8_t channelInputPrescaler;
+    timerChannelInputEdgeTrigger_t inputEdgeTrigger;
+    timerExTrigPrescaler_t channelInputPrescaler;
+    timerChannelInputCapFilter_t inputFilter;
 
 
 } timerChannelConfig_t;
@@ -120,12 +125,15 @@ void timerInit (timerHandle_t *handle);
 
 void timerChannelInit (timerHandle_t *handle, uint8_t channel);
 
+uint16_t timerGetCaptureCompare1Value (timerHandle_t *handle);
+
+uint16_t timerGetCaptureCompare2Value (timerHandle_t *handle);
+
+uint16_t timerGetCaptureCompare3Value (timerHandle_t *handle);
+
+uint16_t timerGetCaptureCompare4Value (timerHandle_t *handle);
+
 void timerSlaveInit (timerHandle_t *handle);
-
-
-
-//void timerSetPeriod (timerHandle_t *handle, uint32_t uSeconds);
-
 
 void timerSetCounterVal (timerHandle_t *handle, uint16_t value);
 

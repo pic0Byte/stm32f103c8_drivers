@@ -89,7 +89,7 @@ static inline void enableClock (_timer_t *timer) {
 }
 
 
-static inline void enableCapComp (timerHandle_t *handle, uint8_t channel) {
+static inline void enableCapCompOut (timerHandle_t *handle, uint8_t channel) {
 
 
     switch (channel) {
@@ -122,6 +122,26 @@ static inline void enableCounter (_timer_t *timer) {
 
     timer->CR1 |= (1u << 0);
 
+}
+
+
+static inline uint16_t getCaptureCompare1Value (_timer_t *timer) {
+    return timer->CCR1;
+}
+
+
+static inline uint16_t getCaptureCompare2Value (_timer_t *timer) {
+    return timer->CCR2;
+}
+
+
+static inline uint16_t getCaptureCompare3Value (_timer_t *timer) {
+    return timer->CCR3;
+}
+
+
+static inline uint16_t getCaptureCompare4Value (_timer_t *timer) {
+    return timer->CCR4;
 }
 
 
@@ -208,6 +228,27 @@ static inline void setChannelDir (timerHandle_t *handle, uint8_t channel) {
 }
 
 
+static inline void setChannelInputFilter(timerHandle_t *handle, uint8_t channel, timerChannelConfig_t *config) {
+
+    uint8_t position = ((((channel - 1) * 8) + 4) % 16);
+    if (channel <= 2) {
+        handle->pTIMx->CCMR1 |= (config->inputFilter << position);
+    } else if (channel <= 4) {
+        handle->pTIMx->CCMR2 |= (config->inputFilter << position);
+    }
+}
+
+
+static inline void setChannelInputPrescaler (timerHandle_t *handle, uint8_t channel, timerChannelConfig_t *config) {
+
+    uint8_t position = ((((channel - 1) * 8) + 2) % 16);
+    if (channel <= 2) {
+        handle->pTIMx->CCMR1 |= (config->channelInputPrescaler << position);
+    } else if (channel <= 4) {
+        handle->pTIMx->CCMR2 |= (config->channelInputPrescaler << position);
+    }
+}
+
 
 static inline void setCountUp (_timer_t *timer) {
 
@@ -244,6 +285,13 @@ static inline void setExtTriggerPrescaler (timerHandle_t *handle) {
 
 
 }
+
+
+static inline void setInputEdgeTrigger(timerHandle_t *handle, uint8_t channel, timerChannelConfig_t *config) {
+    uint8_t position = (((channel - 1) * 4) + 1);
+    handle->pTIMx->CCER |= (config->inputEdgeTrigger << position);
+}
+
 
 
 static inline void setModePeriodic (_timer_t *timer) {
@@ -348,11 +396,14 @@ void timerChannelInit (timerHandle_t *handle, uint8_t channel) {
 
             case TIM_CHDIR_output:
                 setCapCompOutMode (handle, 1);
-                enableCapComp(handle, 1);
+                enableCapCompOut(handle, 1);
                 break;
 
             case TIM_CHDIR_input:
-                //enableCapComp(handle, 1);
+                setInputEdgeTrigger(handle, 1, &(handle->channel1));
+                setChannelInputPrescaler (handle, 1, &(handle->channel1));
+                setChannelInputFilter(handle, 1, &(handle->channel1));
+                enableCapCompOut(handle, 1);
                 break;
 
             case TIM_CHDIR_inputAlt:
@@ -375,11 +426,13 @@ void timerChannelInit (timerHandle_t *handle, uint8_t channel) {
 
                 case TIM_CHDIR_output:
                     setCapCompOutMode (handle, 2);
-                    enableCapComp(handle, 2);
+                    enableCapCompOut(handle, 2);
                     break;
 
                 case TIM_CHDIR_input:
-                    //enableCapComp(handle, 2);
+                    setInputEdgeTrigger(handle, 2, &(handle->channel2));
+                    setChannelInputFilter(handle, 2, &(handle->channel2));
+                    enableCapCompOut(handle, 2);
                     break;
 
                 case TIM_CHDIR_inputAlt:
@@ -400,10 +453,12 @@ void timerChannelInit (timerHandle_t *handle, uint8_t channel) {
 
                     case TIM_CHDIR_output:
                         setCapCompOutMode (handle, 3);
-                        enableCapComp(handle, 3);
+                        enableCapCompOut(handle, 3);
                         break;
 
                     case TIM_CHDIR_input:
+                        setInputEdgeTrigger(handle, 3, &(handle->channel3));
+                        enableCapCompOut(handle, 3);
                         break;
 
                     case TIM_CHDIR_inputAlt:
@@ -424,10 +479,12 @@ void timerChannelInit (timerHandle_t *handle, uint8_t channel) {
 
                         case TIM_CHDIR_output:
                             setCapCompOutMode (handle, 4);
-                            enableCapComp(handle, 4);
+                            enableCapCompOut(handle, 4);
                             break;
 
                         case TIM_CHDIR_input:
+                            setInputEdgeTrigger(handle, 4, &(handle->channel4));
+                            enableCapCompOut(handle, 4);
                             break;
 
                         case TIM_CHDIR_inputAlt:
@@ -447,6 +504,26 @@ void timerChannelInit (timerHandle_t *handle, uint8_t channel) {
         }
     }
 
+}
+
+
+uint16_t timerGetCaptureCompare1Value (timerHandle_t *handle) {
+    return getCaptureCompare1Value(handle->pTIMx);
+}
+
+
+uint16_t timerGetCaptureCompare2Value (timerHandle_t *handle) {
+    return getCaptureCompare2Value(handle->pTIMx);
+}
+
+
+uint16_t timerGetCaptureCompare3Value (timerHandle_t *handle) {
+    return getCaptureCompare3Value(handle->pTIMx);
+}
+
+
+uint16_t timerGetCaptureCompare4Value (timerHandle_t *handle) {
+    return getCaptureCompare4Value(handle->pTIMx);
 }
 
 
