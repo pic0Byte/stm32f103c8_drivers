@@ -29,10 +29,10 @@ typedef TIM_TypeDef _timer_t;
 /*****************************************************************************/
 
 
-typedef enum {TIM_DIR_countUp, TIM_DIR_countDown, TIM_DIR_countUpDown} __attribute__((packed, aligned(1))) timerDirection_t;
+typedef enum {TIM_DIR_countUp, TIM_DIR_countDown, TIM_DIR_countUpDown} timerDirection_t;
 
 
-typedef enum {TIM_MOD_periodic, TIM_MOD_oneShot} __attribute__((packed, aligned(1))) timerMode_t;
+typedef enum {TIM_MOD_periodic, TIM_MOD_oneShot} timerMode_t;
 
 
 typedef enum {TIM_CHDIR_output, TIM_CHDIR_input, TIM_CHDIR_inputAlt, TIM_CHDIR_intTrigger} timerChannelDir_t;
@@ -46,8 +46,8 @@ typedef enum {TIM_ICF_noFilter, TIM_ICF_noDiv2samples, TIM_ICF_noDiv4samples, TI
 typedef enum {TIM_IETR_risingEdge, TIM_IETR_fsllingEdge} timerChannelInputEdgeTrigger_t;
 
 
-typedef enum {TIM_COM_frozen, TIM_COM_setToActive, TIM_COM_setToInactive, TIM_COM_toggle, TIM_COM_forceActive,
-    TIM_COM_forceInactive, TIM_COM_pwmNonInverted, TIM_COM_pwmInverted} timerChannelOutputCompareMode_t;
+typedef enum {TIM_COM_frozen, TIM_COM_setToActive, TIM_COM_setToInactive, TIM_COM_toggle, TIM_COM_forceInactive,
+    TIM_COM_forceActive, TIM_COM_pwmNonInverted, TIM_COM_pwmInverted} timerChannelOutputCompareMode_t;
 
 
 typedef enum {TIM_EXTPR_prescalerDisabled, TIM_EXTPR_divBy2, TIM_EXTPR_divBy4, TIM_EXTPR_divBy8} timerExTrigPrescaler_t;
@@ -124,6 +124,10 @@ typedef struct {
 void timerInit (timerHandle_t *handle);
 
 void timerChannelInit (timerHandle_t *handle, uint8_t channel);
+
+void timerEnable (timerHandle_t *handle);
+
+void timerDisable (timerHandle_t *handle);
 
 uint16_t timerGetCaptureCompare1Value (timerHandle_t *handle);
 
